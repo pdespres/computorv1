@@ -2,12 +2,24 @@
 # espece de encoding: utf-8 putain cong
 import sys
 
-def computorv1(polynom):
-	sys.exit(42)
+def parser(string):
+	return("test_error")
+
+def computorv1(string):
+	error_mes = parser(string)
+	if error_mes != "":
+		sys.exit(error_mes)
+	return
 
 def usage():
 	print "usage: python %s [-?] [polynomial function]" % sys.argv[0]
-	sys.exit(42)
+	sys.exit()
+
+def exit_error(error_mes):
+	if error_mes != "":
+		sys.exit(error_mes)
+	else
+		sys.exit(42)
 
 if __name__ == "__main__":
 	argc = len(sys.argv)
