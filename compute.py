@@ -1,24 +1,28 @@
 #!/usr/bin/env python
-# espece de encoding: utf-8 putain cong
+# waloo le encoding: utf-8 de malade
 import sys
+import re
 
 def parser(string):
-	return("test_error")
+	string = string.replace(' ', '').replace('*', '')
+	regex = r"(^[0-9xX^+=-]+$)"
+	if not re.match(regex, string):
+		exit_error("Unknown character in polynomial function")
+	
+	return("")
 
 def computorv1(string):
-	error_mes = parser(string)
-	if error_mes != "":
-		sys.exit(error_mes)
+	parser(string)
 	return
 
 def usage():
 	print "usage: python %s [-?] [polynomial function]" % sys.argv[0]
-	sys.exit()
+	sys.exit(0)
 
 def exit_error(error_mes):
 	if error_mes != "":
 		sys.exit(error_mes)
-	else
+	else:
 		sys.exit(42)
 
 if __name__ == "__main__":
