@@ -13,24 +13,39 @@ def parser(string):
 			" in the argument")
 	if string.count("=") != 1:
 		exit_error("the argument is not an equation")
-	regex = r"[*]{2,}"
-	p = re.search(regex, string)
-	if p != None:
-		exit_error("too many '" + p.group(0) + "' in the argument")
-	string = string.replace('*', '')
+	#regex = r"[*]{2,}"
+	#p = re.search(regex, string)
+	#if p != None:
+	#	exit_error("too many '" + p.group(0) + "' in the argument")
+	#string = string.replace('*', '')
 	split = string.split('=')
-	left = split[0].replace('-', '+-').split('+')
-	right = split[1].replace('-', '+-').split('+')
-	if left[0] == '':
+	left = re.sub(r"(?<=.)-", "+-", split[0]).split('+')
+	right = re.sub(r"(?<=.)-", "+-", split[1]).split('+')
+	if (len(left) == 1 and left[0] == ''):
 		exit_error("equation left side is blank")
-	if right[0] == '':
+	if (len( right) == 1 and right[0] == ''):
 		exit_error("equation right side is blank")
-	print left
-	print right
+	regex = r"^-?[0-9]*\.?[0-9]*\*?(x?$|x\^[0-9]+)"
+	for s in left:
+		if (not s or s == '-'):
+			exit_error("equation left side has a blank after a +/-")
+		p = re.match(regex, s)
+		if p == None:
+			exit_error("left side => " + s + " is wrongly formatted")
+		s = s.replace('*', '').replace('^', '')
+	for s in right:
+		if (not s or s == '-'):
+			exit_error("equation right side has a blank after a +/-")
+		p = re.match(regex, s)
+		if p == None:
+			exit_error("right side => " + s + " is wrongly formatted")
+		s = s.replace('*', '').replace('^', '')
 	return(left, right)
 
 def computorv1(string):
 	split_eq = parser(string)
+	print split_eq[0]
+	print split_eq[1]
 	return
 
 def usage():
@@ -60,6 +75,8 @@ if __name__ == "__main__":
 		"5 * X^0 + 4 * X^1 = - 9.3 * X^2 = 1 * X^0",
 		"5 *** x^1 = 0",
 		"4 * X =",
+		"5 * X^0 + 4 * X^1 = 5 * X^0 + 4 * X^1 -",
+		"5 * X^0 + 4.3.2 * X^1 = 5 * X^0 + 4..16 * X^1 -",
 		"5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
 		]
 		for s in test:
