@@ -5,16 +5,18 @@ import re
 
 def parser(string):
 	original = string
-	#\033[1;31m \033[0m
-	#string = string.lower().replace(' ', '')
 
 	#looking for unauthorized characters (lexical errors)
 	regex = r"([^0-9x.*^ +=-]+)"
-	p = re.search(regex, string)
+	p = re.search(regex, string, re.I)
 	if p != None:
+		offset = 0
+		str_color = ""
 		for m in re.finditer(regex, string, re.I):
-			print '%02d-%02d: %s' % (m.start(), m.end(), m.group(0))
-		exit_error("unkown string(s) " + ', '.join("'" + x + "'" for x in re.findall(regex, string, re.I)) + \
+			str_color += string[offset:m.start()] + "\033[7;31m" + m.group(0) + "\033[0m"
+			offset = m.end()
+		str_color += string[offset:]
+		exit_error(str_color + "  unkown string(s) " + ', '.join("'" + x + "'" for x in re.findall(regex, string, re.I)) + \
 			" in the equation")
 
 	#looking for the right number of '=' (start of syntax errors)
