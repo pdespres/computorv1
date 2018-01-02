@@ -4,42 +4,56 @@ import sys
 import re
 
 def parser(string):
-	string = string.lower().replace(' ', '')
-	#rajout coloration syntaxique?
-	regex = r"([^0-9x.*^+=-]+)"
+	original = string
+	#\033[1;31m \033[0m
+	#string = string.lower().replace(' ', '')
+
+	#looking for unauthorized characters (lexical errors)
+	regex = r"([^0-9x.*^ +=-]+)"
 	p = re.search(regex, string)
 	if p != None:
+		for m in re.finditer(regex, string, re.I):
+			print '%02d-%02d: %s' % (m.start(), m.end(), m.group(0))
 		exit_error("unkown string(s) " + ', '.join("'" + x + "'" for x in re.findall(regex, string, re.I)) + \
-			" in the argument")
+			" in the equation")
+
+	#looking for the right number of '=' (start of syntax errors)
 	if string.count("=") != 1:
 		exit_error("the argument is not an equation")
-	#regex = r"[*]{2,}"
-	#p = re.search(regex, string)
-	#if p != None:
-	#	exit_error("too many '" + p.group(0) + "' in the argument")
-	#string = string.replace('*', '')
+
+	#split each side, then split on +- (except first one)
+	string = string.lower().replace(' ', '')
 	split = string.split('=')
 	left = re.sub(r"(?<=.)-", "+-", split[0]).split('+')
 	right = re.sub(r"(?<=.)-", "+-", split[1]).split('+')
+
+	#looking for blanks
 	if (len(left) == 1 and left[0] == ''):
 		exit_error("equation left side is blank")
 	if (len( right) == 1 and right[0] == ''):
 		exit_error("equation right side is blank")
+
+	#check format for each side
 	regex = r"^-?[0-9]*\.?[0-9]*\*?(x?$|x\^[0-9]+)"
 	for s in left:
 		if (not s or s == '-'):
 			exit_error("equation left side has a blank after a +/-")
 		p = re.match(regex, s)
 		if p == None:
-			exit_error("left side => " + s + " is wrongly formatted")
+			exit_error("syntax error " + s)
 		s = s.replace('*', '').replace('^', '')
 	for s in right:
 		if (not s or s == '-'):
 			exit_error("equation right side has a blank after a +/-")
 		p = re.match(regex, s)
 		if p == None:
-			exit_error("right side => " + s + " is wrongly formatted")
+			exit_error("syntax error " + s)
 		s = s.replace('*', '').replace('^', '')
+
+	#if at last one error and not in test, prog quits
+	if (exit_error.status == True and __name__ == "__main__"):
+		exit_error("")
+
 	return(left, right)
 
 def computorv1(string):
@@ -52,10 +66,13 @@ def usage():
 	print "usage: python %s [-?] [polynomial equation]" % sys.argv[0]
 	sys.exit(0)
 
-def exit_error(error_mes):
+def exit_error(error_mes, end_prog=False):
+	exit_error.status = True
 	if error_mes != "":
-		#sys.exit("Error: " + error_mes)
-		print("Error: " + error_mes)
+		if end_prog:
+			sys.exit("Error: " + error_mes)
+		else:
+			print("Error: " + error_mes)
 	else:
 		sys.exit(42)
 
@@ -69,19 +86,5 @@ if __name__ == "__main__":
 		#	?
 		#else:
 			usage()
-	if sys.argv[-1].lower() == "-test":
-		test = [
-		"1xsd¨^4=gddd sz",
-		"5 * X^0 + 4 * X^1 = - 9.3 * X^2 = 1 * X^0",
-		"5 *** x^1 = 0",
-		"4 * X =",
-		"5 * X^0 + 4 * X^1 = 5 * X^0 + 4 * X^1 -",
-		"5 * X^0 + 4.3.2 * X^1 = 5 * X^0 + 4..16 * X^1 -",
-		"5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
-		]
-		for s in test:
-			print ""
-			print "Equation: ", s
-			computorv1(s)
 	else:
 		computorv1(sys.argv[-1])
