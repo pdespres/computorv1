@@ -52,7 +52,6 @@ def parser(string):
 	#if at last one error and not in test, prog quits
 	if (exit_error.status == True and __name__ == "__main__"):
 		exit_error("")
-
 	return(left, right)
 
 def reduce(split_eq):
@@ -61,8 +60,40 @@ def reduce(split_eq):
 	left = [s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in split_eq[0]]
 	right = [s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in split_eq[1]]
 
-	print left
-	print right
+	#seeking max power
+	max_power = 0
+	left_nome = []
+	for s in left:
+		if s.find('X') >= 0:
+			if not s.split('X')[0]:
+				d1 = 1.0
+			else:
+				d1 = float(s.split('X')[0])
+			if not s.split('X')[-1]:
+				left_power = 1
+				d2 = 1
+			else:
+				left_power = s.split('X')[-1]
+				d2 = int(s.split('X')[-1])
+		else:
+			left_power = 0
+			d1 = float(s)
+			d2 = 0
+		max_power = max(max_power, left_power)
+		left_nome.append([d2, d1])
+	for s in right:
+		if s.find('X') >= 0:
+			if not s.split('X')[-1]:
+				right_power = 1
+			else:
+				right_power = s.split('X')[-1]
+		else:
+			right_power = 0
+		max_power = max(max_power, right_power)
+
+	#ordering every nome from highest power to lower in one equation
+	print sorted(left_nome, reverse=True)
+	#print left_nome[0]
 
 	return(3)
 
@@ -77,10 +108,6 @@ def computorv1(string):
 	if (degree > 2):
 		print("The polynomial degree is strictly greater than 2, I can't solve.")
 	return
-
-def usage():
-	print "usage: python %s [-?] [polynomial equation]" % sys.argv[0]
-	sys.exit(0)
 
 def exit_error(error_mes, string, regex, find = ""):
 	exit_error.status = True
@@ -101,7 +128,8 @@ def exit_error(error_mes, string, regex, find = ""):
 if __name__ == "__main__":
 	argc = len(sys.argv)
 	if argc not in range(2, 4):
-		usage()
+		print "usage: python %s [-?] [polynomial equation]" % sys.argv[0]
+		sys.exit(0)
 	if argc == 3:
 		#traitement params
 		#if ?:
