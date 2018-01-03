@@ -17,10 +17,10 @@ def parser(string):
 	if string.count("=") != 1:
 		exit_error("the argument is not an equation", string, r"=")
 
-	#split each side, then split on +- (except first one)
+	#split each side, then split on +- (except first one and power)
 	split = string.split('=')
-	left = re.sub(r"(?<=.)-", "+-", split[0].strip()).split('+')
-	right = re.sub(r"(?<=.)-", "+-", split[1].strip()).split('+')
+	left = re.sub(r"(?<!\^)(?<=.)-", "+-", split[0].strip()).split('+')
+	right = re.sub(r"(?<!\^)(?<=.)-", "+-", split[1].strip()).split('+')
 
 	#looking for blanks
 	if (len(left) == 1 and ' '.join(left[0].split()) == ''):
@@ -31,37 +31,39 @@ def parser(string):
 		exit_error("equation right side is blank", original + "_", r"_")
 
 	#check format for each side
-	regex = r"^\s*-?\s*[0-9]*\s*\.?\s*[0-9]*\s*\*?\s*(x?$|x\s*\^\s*[0-9]+)\s*"
+	regex = r"^\s*-?\s*[0-9]*\s*\.?\s*[0-9]*\s*\*?\s*(x?$|x\s*\^\s*[0-9]+)\s*$"
 	for s in left:
 		s = s.strip()
 		if (not s or s == '-'):
 			exit_error("equation left side has a blank after a +/-", original, "", s)
 		p = re.match(regex, s, re.I)
 		if p == None:
-			exit_error("syntax error  " + s, original, "", s)
+			s2 = (s[1:].strip()) if (s[0] == "-") else s
+			exit_error("syntax error  " + s2, original, "", s2)
 	for s in right:
 		s = s.strip()
 		if (not s or s == '-'):
 			exit_error("equation right side has a blank after a +/-", original, "", s)
 		p = re.match(regex, s, re.I)
 		if p == None:
-			exit_error("syntax error  " + s, original, "", s)
-	
+			s2 = (s[1:].strip()) if (s[0] == "-") else s
+			exit_error("syntax error  " + s2, original, "", s2)
 
 	#if at last one error and not in test, prog quits
 	if (exit_error.status == True and __name__ == "__main__"):
 		exit_error("")
 
-	#format each side
-	left = [s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in left]
-	right = [s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in right]
-
 	return(left, right)
 
-def reduced_eq(split_eq):
-	print split_eq[0]
-	print split_eq[1]
-	
+def reduce(split_eq):
+	reduce.degree = 3
+	#format each side
+	left = [s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in split_eq[0]]
+	right = [s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in split_eq[1]]
+
+	print left
+	print right
+
 	return(3)
 
 def computorv1(string):
@@ -69,7 +71,8 @@ def computorv1(string):
 	split_eq = parser(string)
 	if (exit_error.status == True):
 		return
-	degree = reduced_eq(split_eq)
+	reduced_eq = reduce(split_eq)
+	degree = reduce.degree
 	print "Polynomial degree: " + str(degree)
 	if (degree > 2):
 		print("The polynomial degree is strictly greater than 2, I can't solve.")

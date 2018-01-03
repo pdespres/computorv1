@@ -11,6 +11,9 @@ lib = [
 "equation incomplete 2",
 "mauvaise syntaxe 2",
 "manque exposant",
+"exposant neg",
+"exposant non entier",
+"puissance 3+",
 "ok 1",
 "naturel"
 ]
@@ -23,6 +26,9 @@ test = [
 "5 * X^0 + 4 * X^1 = 5 * X^0 + 4 * X^1 + ",
 "5 * X^0 + 4.3.2 * X^1 = 5 * X^0 + 4..16 * X^1",
 "5 * X^0 + 4 * X^1 - 9.3 * X^ = 1 * X^0",
+"8 * X^-4 - 9.3 * X^2 = 1 * X^0",
+"8 * X^4 - 9.3 * X^2.1 = 1 * X^0",
+"8 * X^4 - 9.3 * X^2 = 1 * X^0",
 "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0",
 " -5 + 4X + X^2 -9.3X^2 = -1 +X"
 ]
