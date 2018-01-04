@@ -1,5 +1,10 @@
 #!/usr/bin/env python 2.7
 # waloo le encoding: utf-8 de malade
+
+"""
+test de la zone
+"""
+
 import sys
 import re
 
@@ -16,6 +21,7 @@ def parser(string):
 	#looking for the right number of '=' (start of syntax errors)
 	if string.count("=") != 1:
 		exit_error("the argument is not an equation", string, r"=")
+		return
 
 	#split each side, then split on +- (except first one and power)
 	split = string.split('=')
@@ -55,55 +61,49 @@ def parser(string):
 	return(left, right)
 
 def reduce(split_eq):
-	reduce.degree = 3
 	#format each side
-	left = [s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in split_eq[0]]
-	right = [s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in split_eq[1]]
+	split_eq = [[s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in split] for split in split_eq]
 
-	#seeking max power
-	max_power = 0
-	left_nome = []
-	for s in left:
-		if s.find('X') >= 0:
-			if not s.split('X')[0]:
-				d1 = 1.0
+	#calculate every distinct nome in one equation/side
+	lst_nome = []
+	for index, split in enumerate(split_eq):
+		for s in split:
+			found = 0
+			if s.find('X') >= 0:
+				if not s.split('X')[0]:
+					d1 = 1.0
+				else:
+					d1 = float(s.split('X')[0])
+				if not s.split('X')[-1]:
+					d2 = 1
+				else:
+					d2 = int(s.split('X')[-1])
 			else:
-				d1 = float(s.split('X')[0])
-			if not s.split('X')[-1]:
-				left_power = 1
-				d2 = 1
-			else:
-				left_power = s.split('X')[-1]
-				d2 = int(s.split('X')[-1])
-		else:
-			left_power = 0
-			d1 = float(s)
-			d2 = 0
-		max_power = max(max_power, left_power)
-		left_nome.append([d2, d1])
-	for s in right:
-		if s.find('X') >= 0:
-			if not s.split('X')[-1]:
-				right_power = 1
-			else:
-				right_power = s.split('X')[-1]
-		else:
-			right_power = 0
-		max_power = max(max_power, right_power)
+				d1 = float(s)
+				d2 = 0
+			for index, nome in enumerate(lst_nome):
+				if nome[0] == d2:
+					found = 1
+					nome[1] += (d1 if index == 0 else -d1)
+					break
+			if not found:
+				if index == 0:
+					lst_nome.append([d2, d1])
+				else:
+					lst_nome.append([d2,-d1])
 
-	#ordering every nome from highest power to lower in one equation
-	print sorted(left_nome, reverse=True)
-	#print left_nome[0]
+	#ordering from highest power to lowest
+	lst_nome = sorted(lst_nome, reverse=True)
 
-	return(3)
+	return(lst_nome)
 
-def computorv1(string):
+def computorv1(string, param=0):
 	exit_error.status = False
 	split_eq = parser(string)
 	if (exit_error.status == True):
 		return
 	reduced_eq = reduce(split_eq)
-	degree = reduce.degree
+	degree = reduced_eq[0][0]
 	print "Polynomial degree: " + str(degree)
 	if (degree > 2):
 		print("The polynomial degree is strictly greater than 2, I can't solve.")
@@ -125,16 +125,26 @@ def exit_error(error_mes, string, regex, find = ""):
 	else:
 		sys.exit(42)
 
+def usage():
+	print "usage:\tpython %s [-v] [polynomial equation]" % sys.argv[0]
+	print "\toptions\t-v\tverbose"
+	sys.exit(0)
+
 if __name__ == "__main__":
 	argc = len(sys.argv)
 	if argc not in range(2, 4):
-		print "usage: python %s [-?] [polynomial equation]" % sys.argv[0]
-		sys.exit(0)
+		usage()
 	if argc == 3:
 		#traitement params
-		#if ?:
-		#	?
-		#else:
+		param = 0
+		if (sys.argv[1][0] == '-' and len(sys.argv[1]) in range(2,3)):
+			if sys.argv[1].find('v') > 0:
+				param += 1
+			if param > 0:
+				computorv1(sys.argv[-1], param)
+			else:
+				usage()
+		else:
 			usage()
 	else:
 		computorv1(sys.argv[-1])
