@@ -1,7 +1,7 @@
 #!/usr/bin/env python 2.7
 # waloo le encoding: utf-8 de malade
 
-import compute
+import computor
 
 lib = [
 "caracteres en plus",
@@ -39,4 +39,4 @@ for s in test:
 	print lib[i]
 	print "Equation: ", s
 	i += 1
-	compute.computorv1(s)
+	computor.computorv1(s, 1)

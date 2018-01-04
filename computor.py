@@ -2,7 +2,11 @@
 # waloo le encoding: utf-8 de malade
 
 """
-test de la zone
+\033[32musage:	python computor.py [OPTIONS] [polynomial equation]
+
+Supported options:
+	-s 		silent		don't show the parsing error messages
+	-v 		verbose		show messages about intermediary steps\033[0m
 """
 
 import sys
@@ -92,12 +96,25 @@ def reduce(split_eq):
 				else:
 					lst_nome.append([d2,-d1])
 
+	if params.verbose:
+		print_eq(lst_nome)
 	#ordering from highest power to lowest
 	lst_nome = sorted(lst_nome, reverse=True)
-
+	if params.verbose:
+		print_eq(lst_nome)
 	return(lst_nome)
 
+def params(param):
+	#load params according to the command line options
+	params.silent = False
+	params.verbose = False
+	if param in (1,3):
+		params.verbose = True
+	if param in (2,3):
+		params.silent = True
+
 def computorv1(string, param=0):
+	params(param)
 	exit_error.status = False
 	split_eq = parser(string)
 	if (exit_error.status == True):
@@ -110,7 +127,11 @@ def computorv1(string, param=0):
 	return
 
 def exit_error(error_mes, string, regex, find = ""):
+	if params.silent and not exit_error.status:
+		print("Error")
 	exit_error.status = True
+	if params.silent:
+		return
 	offset = 0
 	str_color = ""
 	if (regex != ""):
@@ -125,26 +146,23 @@ def exit_error(error_mes, string, regex, find = ""):
 	else:
 		sys.exit(42)
 
-def usage():
-	print "usage:\tpython %s [-v] [polynomial equation]" % sys.argv[0]
-	print "\toptions\t-v\tverbose"
-	sys.exit(0)
-
 if __name__ == "__main__":
 	argc = len(sys.argv)
 	if argc not in range(2, 4):
-		usage()
-	if argc == 3:
+		print(__doc__)
+	elif argc == 3:
 		#traitement params
 		param = 0
 		if (sys.argv[1][0] == '-' and len(sys.argv[1]) in range(2,3)):
 			if sys.argv[1].find('v') > 0:
 				param += 1
+			if sys.argv[1].find('s') > 0:
+				param += 2
 			if param > 0:
 				computorv1(sys.argv[-1], param)
 			else:
-				usage()
+				print(__doc__)
 		else:
-			usage()
+			print(__doc__)
 	else:
 		computorv1(sys.argv[-1])
