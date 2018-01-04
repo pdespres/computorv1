@@ -102,7 +102,25 @@ def reduce(split_eq):
 	lst_nome = sorted(lst_nome, reverse=True)
 	if params.verbose:
 		print_eq(lst_nome)
+	lst_mult = [s[1] for s in lst_nome]
+	print pgcd_lst(lst_mult)
 	return(lst_nome)
+
+def print_eq(eq):
+	r = ""
+	for s in eq:
+		r += str(s[1]) + " * X^" + str(s[0]) + " + "
+	print r + " = 0"
+
+def pgcd(a,b) :  
+   while a%b != 0 : 
+      a, b = b, a%b 
+   return b
+def pgcd_lst(n):
+	p = pgcd(n[0], n[1])
+	for x in n[2:]:
+		p = pgcd(p, x)
+	return p
 
 def params(param):
 	#load params according to the command line options
