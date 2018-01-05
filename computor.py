@@ -11,6 +11,7 @@ Supported options:
 """
 
 #TODO fractions
+#terminer saisie naturelle
 
 import sys
 import re
@@ -201,9 +202,10 @@ def computorv1(string, param=0):
 			if params.graph:
 				import graph
 				formula = ""
-				for s in reduced_eq:
-					formula += "%g" % s[1] + ("*x" if s[0] > 0 else "") + ("**%g" % s[0] if s[0] > 1 else "") + "+"
-				graph.graph(formula[:-3], -10, 10)
+				for i, s in enumerate(reduced_eq):
+					formula += ("+" if (s[1] > 0 and i > 0) else "") + "%g" % s[1] + \
+					("*x" if s[0] > 0 else "") + ("**%g" % s[0] if s[0] > 1 else "")
+				graph.graph(formula, -10, 10)
 	return
 
 def exit_error(error_mes, string, regex, find = ""):

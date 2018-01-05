@@ -43,4 +43,4 @@ for s in test:
 	print lib[i]
 	print "Equation:\t", s
 	i += 1
-	computor.computorv1(s, 1)
+	computor.computorv1(s, 5)
