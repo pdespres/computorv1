@@ -14,8 +14,9 @@ lib = [
 "exposant neg",
 "exposant non entier",
 "puissance 3+",
-"ok 1",
-"ok2"
+"ok 1 degree 0",
+"ok 2 pgcd",
+"ok 1 degree 1",
 "naturel"
 ]
 
@@ -30,8 +31,9 @@ test = [
 "8 * X^-4 - 9.3 * X^2 = 1 * X^0",
 "8 * X^4 - 9.3 * X^2.1 +x^4= 1 * X^0",
 "8 * X^4 - 9 * X^2 + 6 +x^4= 1 * X^0 + X^6",
-"5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0",
-"25x + 2.5x^2 = 0",
+"- 9.3 = 1 * X^0",
+"3x + 9x^2 + 15= 0",
+" -5 + 4X = -1 +X",
 " -5 + 4X + X^2 -9.3X^2 = -1 +X"
 ]
 
@@ -39,6 +41,6 @@ i = 0
 for s in test:
 	print ""
 	print lib[i]
-	print "Equation: ", s
+	print "Equation:\t", s
 	i += 1
 	computor.computorv1(s, 1)
