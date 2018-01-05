@@ -6,11 +6,11 @@
 
 Supported options:
 	-s 		silent		don't show the parsing error messages
-	-v 		verbose		show messages about intermediary steps\033[0m
+	-v 		verbose		show messages about intermediary steps
+	-g 		graph 		popup window with the equation graph\033[0m
 """
 
 #TODO fractions
-#TODO graph numpy/matplotlib
 
 import sys
 import re
@@ -101,12 +101,12 @@ def reduce(split_eq):
 				else:
 					lst_nome.append([d2,-d1])
 	if params.verbose:
-		print_eq(lst_nome, " group nomes:\t")
+		print_eq(lst_nome, " \033[32mgroup nomes:\t")
 
 	#ordering from highest power to lowest
 	lst_nome = sorted(lst_nome, reverse=True)
 	if params.verbose:
-		print_eq(lst_nome," sorted:\t")
+		print_eq(lst_nome," \033[32msorted:\t")
 
 	#calculate pgcd and if exists reduce further the equation
 	lst_mult = [s[1] for s in lst_nome]
@@ -117,7 +117,7 @@ def reduce(split_eq):
 				p = pgcd(p, x)
 		if p != 1:
 			lst_nome = [[s[0], s[1] / p] for s in lst_nome]
-			print_eq(lst_nome, " pgcd:\t\t")
+			print_eq(lst_nome, " \033[32mpgcd:\t\t")
 
 	return(lst_nome)
 
@@ -127,12 +127,14 @@ def solve(eq, degree):
 			print("The equation is always true, all numbers are solutions.")
 		else:
 			print("The equation is always false, there is no solution.")
+		return (0)
 	elif degree == 1:
 		if len(eq) == 1:
 			print("The solution is:\n0")
 		else:
 			print("The solution is:\n%g" % (-eq[0][1] / eq[1][1]))
 	else:
+		#calculate the discriminant
 		a = b = c = 0
 		for s in eq:
 			if s[0] == 2:
@@ -143,7 +145,7 @@ def solve(eq, degree):
 				c = s[1]
 		discriminant = b**2 - 4 * (a * c)
 		if params.verbose:
-			print " discriminant:\t%g" % discriminant
+			print " \033[32mdiscriminant:\t%g\033[0m" % discriminant
 		if discriminant > 0:
 			print "Discriminant is strictly positive, the two solutions are:"
 			print "%g" % ((-b + discriminant**0.5) / (2 * a))
@@ -155,13 +157,13 @@ def solve(eq, degree):
 			print "Discriminant is strictly negative, the two complex solutions are:"
 			print "%g" % (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
 			print "%g" % (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
-	return
+	return (1)
 
 def print_eq(eq, text):
 	r = ""
 	for s in eq:
 		r += "%g" % s[1] + " * X^" + "%g" % s[0] + " + "
-	print text, r[:-3] + " = 0"
+	print text, r[:-3] + " = 0\033[0m"
 
 def pgcd(a,b) :
 	if a % 1 > 0 or b % 1 > 0:
@@ -174,10 +176,13 @@ def params(param):
 	#load params according to the command line options
 	params.silent = False
 	params.verbose = False
-	if param in (1,3):
+	params.graph = False
+	if param in (1,3,5,7):
 		params.verbose = True
-	if param in (2,3):
+	if param in (2,3,6,7):
 		params.silent = True
+	if param in (4,5,6,7):
+		params.graph = True
 
 def computorv1(string, param=0):
 	params(param)
@@ -188,11 +193,17 @@ def computorv1(string, param=0):
 	reduced_eq = reduce(split_eq)
 	print_eq(reduced_eq, "Reduced form:\t")
 	degree = reduced_eq[0][0]
-	print "Polynomial degree: " + str(degree)
+	print "Polynomial degree: %g" % degree
 	if (degree > 2):
 		print("The polynomial degree is strictly greater than 2, I can't solve.")
 	else:
-		solve(reduced_eq, degree)
+		if solve(reduced_eq, degree):
+			if params.graph:
+				import graph
+				formula = ""
+				for s in reduced_eq:
+					formula += "%g" % s[1] + ("*x" if s[0] > 0 else "") + ("**%g" % s[0] if s[0] > 1 else "") + "+"
+				graph.graph(formula[:-3], -10, 10)
 	return
 
 def exit_error(error_mes, string, regex, find = ""):
@@ -227,6 +238,8 @@ if __name__ == "__main__":
 				param += 1
 			if sys.argv[1].find('s') > 0:
 				param += 2
+			if sys.argv[1].find('g') > 0:
+				param += 4
 			if param > 0:
 				computorv1(sys.argv[-1], param)
 			else:
