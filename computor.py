@@ -2,16 +2,18 @@
 # waloo le encoding: utf-8 de malade
 
 """
-\033[32musage:	python computor.py [OPTIONS] [polynomial equation]
+\033[32musage:	python computor.py [-svgf] [polynomial equation]
 
 Supported options:
 	-s 		silent		don't show the parsing error messages
-	-v 		verbose		show messages about intermediary steps
-	-g 		graph 		popup window with the equation graph\033[0m
+	-v 		verbose		show intermediary steps
+	-g 		graph 		popup window with the equation graph
+	-f 		fraction 	display numbers with fractions\033[0m
 """
 
 #TODO fractions
 #terminer saisie naturelle
+#paufiner le graph
 
 import sys
 import re
@@ -156,8 +158,8 @@ def solve(eq, degree):
 			print "%g" % (-b / (2 * a))
 		else:
 			print "Discriminant is strictly negative, the two complex solutions are:"
-			print "%g" % (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
-			print "%g" % (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
+			print "%g" % (-b / (2 * a)) + " + i * " + "%g" % ((-discriminant**05) / (2 * a))
+			print "%g" % (-b / (2 * a)) + " - i * " + "%g" % ((-discriminant**05) / (2 * a))
 	return (1)
 
 def print_eq(eq, text):
@@ -178,12 +180,15 @@ def params(param):
 	params.silent = False
 	params.verbose = False
 	params.graph = False
-	if param in (1,3,5,7):
+	params.fraction = False
+	if param in (1, 3, 5, 7, 9,11,13,15):
 		params.verbose = True
-	if param in (2,3,6,7):
+	if param in (2, 3, 6, 7,10,11,14,15):
 		params.silent = True
-	if param in (4,5,6,7):
+	if param in (4, 5, 6, 7,12,13,14,15):
 		params.graph = True
+	if param in (8, 9,10,11,12,13,14,15):
+		params.fraction = True
 
 def computorv1(string, param=0):
 	params(param)
@@ -242,6 +247,8 @@ if __name__ == "__main__":
 				param += 2
 			if sys.argv[1].find('g') > 0:
 				param += 4
+			if sys.argv[1].find('f') > 0:
+				param += 8				
 			if param > 0:
 				computorv1(sys.argv[-1], param)
 			else:
