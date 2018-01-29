@@ -12,11 +12,6 @@ Supported options:
 """
 
 #TODO fractions
-<<<<<<< HEAD
-=======
-#terminer saisie naturelle
-#paufiner le graph
->>>>>>> 27847787596f05dce4e7c1fb7a17e3da457e8642
 
 import sys
 import re
@@ -173,15 +168,9 @@ def solve(eq, degree):
 			x1 = (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
 			x2 = (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
 			print "Discriminant is strictly negative, the two complex solutions are:"
-<<<<<<< HEAD
 			print "%g" % (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
 			print "%g" % (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
 	return (x1, x2)
-=======
-			print "%g" % (-b / (2 * a)) + " + i * " + "%g" % ((-discriminant**05) / (2 * a))
-			print "%g" % (-b / (2 * a)) + " - i * " + "%g" % ((-discriminant**05) / (2 * a))
-	return (1)
->>>>>>> 27847787596f05dce4e7c1fb7a17e3da457e8642
 
 def print_eq(eq, text):
 	r = ""
