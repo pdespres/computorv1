@@ -11,7 +11,6 @@ Supported options:
 """
 
 #TODO fractions
-#terminer saisie naturelle
 
 import sys
 import re
@@ -65,13 +64,13 @@ def parser(string):
 
 	#if at last one error and not in test, prog quits
 	if (exit_error.status == True and __name__ == "__main__"):
-		exit_error("")
+		exit_error("","","")
 	return(left, right)
 
 def reduce(split_eq):
+	reduce.naturalScript = False
 	#format each side
 	split_eq = [[s.upper().replace(' ', '').replace('*', '').replace('^', '') for s in split] for split in split_eq]
-
 	#calculate every distinct nome in one equation/side
 	lst_nome = []
 	for i1, split in enumerate(split_eq):
@@ -79,14 +78,17 @@ def reduce(split_eq):
 			found = 0
 			if s.find('X') >= 0:
 				if not s.split('X')[0]:
+					reduce.naturalScript = True
 					d1 = 1.0
 				else:
 					d1 = float(s.split('X')[0])
 				if not s.split('X')[-1]:
+					reduce.naturalScript = True
 					d2 = 1
 				else:
 					d2 = int(s.split('X')[-1])
 			else:
+				reduce.naturalScript = True
 				d1 = float(s)
 				d2 = 0
 			for i2, nome in enumerate(lst_nome):
@@ -101,6 +103,8 @@ def reduce(split_eq):
 					lst_nome.append([d2, d1])
 				else:
 					lst_nome.append([d2,-d1])
+	if not lst_nome:
+		lst_nome.append([0, 0])
 	if params.verbose:
 		print_eq(lst_nome, " \033[32mgroup nomes:\t")
 
@@ -128,12 +132,14 @@ def solve(eq, degree):
 			print("The equation is always true, all numbers are solutions.")
 		else:
 			print("The equation is always false, there is no solution.")
-		return (0)
+		return (None, None)
 	elif degree == 1:
 		if len(eq) == 1:
+			x1 = x2 = 0
 			print("The solution is:\n0")
 		else:
-			print("The solution is:\n%g" % (-eq[0][1] / eq[1][1]))
+			x1 = x2 = (-eq[1][1] / eq[0][1])
+			print("The solution is:\n%g" % (-eq[1][1] / eq[0][1]))
 	else:
 		#calculate the discriminant
 		a = b = c = 0
@@ -148,23 +154,46 @@ def solve(eq, degree):
 		if params.verbose:
 			print " \033[32mdiscriminant:\t%g\033[0m" % discriminant
 		if discriminant > 0:
+			x1 = (-b + discriminant**0.5) / (2 * a)
+			x2 = (-b + discriminant**0.5) / (2 * a)
 			print "Discriminant is strictly positive, the two solutions are:"
 			print "%g" % ((-b + discriminant**0.5) / (2 * a))
 			print "%g" % ((-b - discriminant**0.5) / (2 * a))
 		elif discriminant == 0:
+			x1 = x2 = -b / (2 * a)
 			print "Discriminant is nul, the solution is:"
 			print "%g" % (-b / (2 * a))
 		else:
+			x1 = (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
+			x2 = (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
 			print "Discriminant is strictly negative, the two complex solutions are:"
 			print "%g" % (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
 			print "%g" % (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
-	return (1)
+	return (x1, x2)
 
 def print_eq(eq, text):
 	r = ""
 	for s in eq:
-		r += "%g" % s[1] + " * X^" + "%g" % s[0] + " + "
-	print text, r[:-3] + " = 0\033[0m"
+		if reduce.naturalScript:
+			if s[1] < 0:
+				r += "- "
+			else:
+				if r != "":
+					r += "+ "
+			if abs(s[1]) != 1:
+				r += "%g" % s[1] + " "
+			if s[0] == 1:
+				r += "X "
+			elif s[0] != 0:
+				r += "X^" + "%g" % s[0] + " "
+		else:
+#			if s[1] < 0:
+#				r += "- %g" % s[1] + " * X^" + "%g" % s[0] + " "
+#			else:
+				if r != "":
+					r += "+ "
+				r += "%g" % s[1] + " * X^" + "%g" % s[0] + " "
+	print text, r[:-1] + " = 0\033[0m"
 
 def pgcd(a,b) :
 	if a % 1 > 0 or b % 1 > 0:
@@ -198,14 +227,17 @@ def computorv1(string, param=0):
 	if (degree > 2):
 		print("The polynomial degree is strictly greater than 2, I can't solve.")
 	else:
-		if solve(reduced_eq, degree):
+		(x1, x2) = solve(reduced_eq, degree)
+		if x1 is not None and x2 is not None:
 			if params.graph:
 				import graph
 				formula = ""
 				for i, s in enumerate(reduced_eq):
 					formula += ("+" if (s[1] > 0 and i > 0) else "") + "%g" % s[1] + \
 					("*x" if s[0] > 0 else "") + ("**%g" % s[0] if s[0] > 1 else "")
-				graph.graph(formula, -10, 10)
+				x1 -= 10
+				x2 += 10
+				graph.graph(formula, int(round(x1)), int(round(x2)))
 	return
 
 def exit_error(error_mes, string, regex, find = ""):
@@ -235,7 +267,7 @@ if __name__ == "__main__":
 	elif argc == 3:
 		#traitement params
 		param = 0
-		if (sys.argv[1][0] == '-' and len(sys.argv[1]) in range(2,3)):
+		if (sys.argv[1][0] == '-' and len(sys.argv[1]) in range(2,5)):
 			if sys.argv[1].find('v') > 0:
 				param += 1
 			if sys.argv[1].find('s') > 0:
