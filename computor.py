@@ -128,6 +128,7 @@ def reduce(split_eq):
 	return(lst_nome)
 
 def solve(eq, degree):
+	x1 = x2 = 0.0
 	if degree == 0:
 		if eq[0][1] == 0:
 			print("The equation is always true, all numbers are solutions.")
@@ -165,8 +166,8 @@ def solve(eq, degree):
 			print "Discriminant is nul, the solution is:"
 			print "%g" % (-b / (2 * a))
 		else:
-			x1 = (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
-			x2 = (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
+			x1 = (-b / (2 * a))
+			x2 = (-b / (2 * a))
 			print "Discriminant is strictly negative, the two complex solutions are:"
 			print "%g" % (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
 			print "%g" % (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
@@ -176,24 +177,37 @@ def print_eq(eq, text):
 	r = ""
 	for s in eq:
 		if reduce.naturalScript:
-			if s[1] < 0:
-				r += "- "
-			else:
+			if s[1] == -1:
 				if r != "":
-					r += "+ "
+					r += "- "
+				else:
+					r += "-"
+			else:
+				if s[1] < 0:
+					if r != "":
+						r += "- "
+					else:
+						r += "-"
+				else:
+					if r != "":
+						r += "+ "
 			if abs(s[1]) != 1:
-				r += "%g" % s[1] + " "
+				r += "%g" % abs(s[1]) + " "
 			if s[0] == 1:
 				r += "X "
 			elif s[0] != 0:
 				r += "X^" + "%g" % s[0] + " "
 		else:
-#			if s[1] < 0:
-#				r += "- %g" % s[1] + " * X^" + "%g" % s[0] + " "
-#			else:
+			if s[1] < 0:
+				if r != "":
+					r += "- "
+				else:
+					r += "-"
+				#r += "%g" % abs(s[1]) + " * X^" + "%g" % s[0] + " "
+			else:
 				if r != "":
 					r += "+ "
-				r += "%g" % s[1] + " * X^" + "%g" % s[0] + " "
+			r += "%g" % s[1] + " * X^" + "%g" % s[0] + " "
 	print text, r[:-1] + " = 0\033[0m"
 
 def pgcd(a,b) :
