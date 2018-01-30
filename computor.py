@@ -8,7 +8,7 @@ Supported options:
 	-s 		silent		don't show the parsing error messages
 	-v 		verbose		show intermediary steps
 	-g 		graph 		popup window with the equation graph
-	-f 		fraction 	display numbers with fractions\033[0m
+	-f 		fraction 	displayvgf numbers with fractions\033[0m
 """
 
 #TODO fractions
@@ -82,7 +82,11 @@ def reduce(split_eq):
 					reduce.naturalScript = True
 					d1 = 1.0
 				else:
-					d1 = float(s.split('X')[0])
+					if s.split('X')[0] == "-":
+						reduce.naturalScript = True
+						d1 = -1.0
+					else:
+						d1 = float(s.split('X')[0])
 				if not s.split('X')[-1]:
 					reduce.naturalScript = True
 					d2 = 1
@@ -141,7 +145,8 @@ def solve(eq, degree):
 			print("The solution is:\n0")
 		else:
 			x1 = x2 = (-eq[1][1] / eq[0][1])
-			print("The solution is:\n%g" % (-eq[1][1] / eq[0][1]))
+			#print("The solution is:\n%g" % (-eq[1][1] / eq[0][1]))
+			print("The solution is:\n" + fraction(-eq[1][1], eq[0][1]))
 	else:
 		#calculate the discriminant
 		a = b = c = 0
@@ -159,19 +164,37 @@ def solve(eq, degree):
 			x1 = (-b + discriminant**0.5) / (2 * a)
 			x2 = (-b + discriminant**0.5) / (2 * a)
 			print "Discriminant is strictly positive, the two solutions are:"
-			print "%g" % ((-b + discriminant**0.5) / (2 * a))
-			print "%g" % ((-b - discriminant**0.5) / (2 * a))
+			#print "%g" % ((-b + discriminant**0.5) / (2 * a))
+			#print "%g" % ((-b - discriminant**0.5) / (2 * a))
+			print fraction((-b + discriminant**0.5) ,(2 * a))
+			print fraction((-b - discriminant**0.5) ,(2 * a))
 		elif discriminant == 0:
 			x1 = x2 = -b / (2 * a)
 			print "Discriminant is nul, the solution is:"
-			print "%g" % (-b / (2 * a))
+			#print "%g" % (-b / (2 * a))
+			print fraction(-b, (2 * a))
 		else:
 			x1 = (-b / (2 * a))
 			x2 = (-b / (2 * a))
 			print "Discriminant is strictly negative, the two complex solutions are:"
-			print "%g" % (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
-			print "%g" % (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
+			#print "%g" % (-b / (2 * a)) + " + i " + "%g" % ((-discriminant**05) / (2 * a))
+			#print "%g" % (-b / (2 * a)) + " - i " + "%g" % ((-discriminant**05) / (2 * a))
+			print fraction(-b, (2 * a)) + " + i * " + fraction((-discriminant**05), (2 * a))
+			print fraction(-b, (2 * a)) + " - i * " + fraction((-discriminant**05), (2 * a))
 	return (x1, x2)
+
+def fraction(num, den):
+	if params.fraction == False:
+		return "%g" % (num / den)
+	numStr = '{}'.format(num / den).split('.')
+	if len(numStr[1]) < 4:
+		return "%g" % (num / den)
+	else:
+		p = pgcd(num, den)
+		if p != 1:
+			return '%g/%g' % (num/p, den/p)
+		else:
+			return '%g/%g' % (num, den)
 
 def print_eq(eq, text):
 	r = ""
@@ -191,7 +214,7 @@ def print_eq(eq, text):
 				else:
 					if r != "":
 						r += "+ "
-			if abs(s[1]) != 1:
+			if abs(s[1]) != 1 or (abs(s[1]) == 1 and s[0] == 0):
 				r += "%g" % abs(s[1]) + " "
 			if s[0] == 1:
 				r += "X "
@@ -207,7 +230,7 @@ def print_eq(eq, text):
 			else:
 				if r != "":
 					r += "+ "
-			r += "%g" % s[1] + " * X^" + "%g" % s[0] + " "
+			r += "%g" % abs(s[1]) + " * X^" + "%g" % s[0] + " "
 	print text, r[:-1] + " = 0\033[0m"
 
 def pgcd(a,b) :
