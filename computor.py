@@ -8,7 +8,7 @@ Supported options:
 	-s 		silent		don't show the parsing error messages
 	-v 		verbose		show intermediary steps
 	-g 		graph 		popup window with the equation graph
-	-f 		fraction 	displayvgf numbers with fractions\033[0m
+	-f 		fraction 	display numbers with fractions\033[0m
 """
 
 #TODO fractions
