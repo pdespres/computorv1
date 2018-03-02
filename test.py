@@ -19,10 +19,11 @@ lib = [
 "degree 0 no solution",
 "degree 0 all solutions",
 "degree 1 + fraction",
-"degree 2 discriminant < 0 + pgcd",
+"degree 2 discriminant < 0",
 "degree 2 discriminant = 0",
 
-"degree 2 discriminant > 0"
+"degree 2 discriminant > 0",
+"degree 2 + pgcd"
 ]
 
 test = [
@@ -44,7 +45,8 @@ test = [
 "3 x^2 + 5x + 7 = 0",
 "4x^2 + 4x + 1 = 0",
 
-"2x^2 + 9x = 5"
+"2x^2 + 9x = 5",
+"3 x^2 + 5x + 9 = -4x"
 ]
 
 i = 0
